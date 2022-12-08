@@ -157,7 +157,7 @@ def hmap_gen(m, scale_factor, exp_factor):
     return hmap
 
 
-def path_step(origin, x, y, z, unvisited, hmap, n):
+def path_step(origin, x, y, unvisited, hmap, n):
     """Function performing single step of Dijkstra's algorithm.
 
     origin - origin point,
@@ -173,7 +173,7 @@ def path_step(origin, x, y, z, unvisited, hmap, n):
         go_to = hmap[x][y]
         if not go_to.visited:
             # Calculating new path length to go-to point
-            a = origin.d + origin.dist(go_to, z)
+            a = origin.d + origin.dist(go_to)
             # If shorter than previous one
             if a < go_to.d:
                 go_to.d = a  # Assign shorter path length
@@ -236,14 +236,14 @@ def dijkstra(m=8, random_endpoints=False):
         x, y = target.pos  # Acquiring target position to evaluate neighbors
 
         # Performing steps of Dijkstra's algorithm for neighboring points
-        path_step(target, x - 1, y, 1, unvisited, hmap, n)
-        path_step(target, x + 1, y, 1, unvisited, hmap, n)
-        path_step(target, x, y - 1, 1, unvisited, hmap, n)
-        path_step(target, x, y + 1, 1, unvisited, hmap, n)
-        path_step(target, x - 1, y - 1, 2, unvisited, hmap, n)
-        path_step(target, x - 1, y + 1, 2, unvisited, hmap, n)
-        path_step(target, x + 1, y - 1, 2, unvisited, hmap, n)
-        path_step(target, x + 1, y + 1, 2, unvisited, hmap, n)
+        path_step(target, x - 1, y, unvisited, hmap, n)
+        path_step(target, x + 1, y, unvisited, hmap, n)
+        path_step(target, x, y - 1, unvisited, hmap, n)
+        path_step(target, x, y + 1, unvisited, hmap, n)
+        path_step(target, x - 1, y - 1, unvisited, hmap, n)
+        path_step(target, x - 1, y + 1, unvisited, hmap, n)
+        path_step(target, x + 1, y - 1, unvisited, hmap, n)
+        path_step(target, x + 1, y + 1, unvisited, hmap, n)
 
         # Logging procedure
         iteration += 1  # Increment of iteration counter

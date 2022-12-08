@@ -1,6 +1,6 @@
 # Point.py
 
-from numpy import inf, sqrt
+from numpy import inf, norm
 
 
 class Point:
@@ -14,9 +14,9 @@ class Point:
         self.path = path  # path to the point, initialized empty
         self.visited = False  # check if point was visited by DA yet
 
-    def dist(self, neighbor, z):
-        """Method calculating distance between two neighbors given poth points.
+    def dist(self, other):
+        """Method calculating distance between two others given poth points."""
 
-        z - distance squared in x-y plane"""
-
-        return sqrt(z + (self.h - neighbor.h)**2)
+        return norm([self.pos[0] - other.pos[0],
+                     self.pos[1] - other.pos[1],
+                     self.h - other.h])
