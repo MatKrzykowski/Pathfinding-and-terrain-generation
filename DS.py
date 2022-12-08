@@ -17,7 +17,6 @@ def gen_points(n):
     n - sidelenght of the map"""
 
     while True:  # Execute until rights points are found
-
         # Random integers from 0 to n-1
         x1, y1, x2, y2 = np.random.randint(n, size=4)
 
@@ -43,10 +42,10 @@ def map_graph(hmap, endpoint, is_distancemap=False):
         A = np.array([[hmap[i][j].d for i in range(n)] for j in range(n)])
     # Copy height map to A
     else:
-        A = np.array([[hmap[i][j].h for i in range(n)] for j in range(n)])
+        A = np.array([[hmap[i][j].z for i in range(n)] for j in range(n)])
 
     # Copy path assigned to end point
-    verts = endpoint.path
+    verts = np.array(endpoint.path)[:,0:2]
     # Assign codes to the verts
     codes = [Path.LINETO for i in range(len(verts))]  # optional Path.CURVE4
     codes[0] = Path.MOVETO  # Start point code
@@ -102,12 +101,12 @@ def hmap_gen(m, scale_factor, exp_factor):
     hmap = [[Point(0.0, i, j, path=[]) for j in range(n)] for i in range(n)]
 
     # Corner points generator to start off DSA
-    hmap[0][0].h = np.random.randn() * scale_factor
-    hmap[2**m][0].h = np.random.randn() * scale_factor
-    hmap[0][2**m].h = np.random.randn() * scale_factor
-    hmap[2**m][2**m].h = np.random.randn() * scale_factor
+    hmap[0][0].z = np.random.randn() * scale_factor
+    hmap[2**m][0].z = np.random.randn() * scale_factor
+    hmap[0][2**m].z = np.random.randn() * scale_factor
+    hmap[2**m][2**m].z = np.random.randn() * scale_factor
     # Center assigned for "hill" feature
-    hmap[2**(m - 1)][2**(m - 1)].h = 3 * scale_factor
+    hmap[2**(m - 1)][2**(m - 1)].z = 3 * scale_factor
 
     # Loop over m - number of stages of the algorithm
     for i in range(m):
@@ -121,13 +120,13 @@ def hmap_gen(m, scale_factor, exp_factor):
                 kx2 = k * x * 2  # Variable assigned to speed up computation
 
                 target = hmap[jx2 + x][kx2 + x]  # Get object from the matrix
-                if target.h == 0:  # Skip if point already evaluated
+                if target.z == 0:  # Skip if point already evaluated
                     # Add values of the neighbors
-                    target.h = hmap[jx2][kx2].h + hmap[jx2 + 2 * x][kx2].h +\
-                        hmap[jx2][kx2 + 2 * x].h + \
-                        hmap[jx2 + 2 * x][kx2 + 2 * x].h
-                    target.h = target.h / 4  # Divide to get average
-                    target.h += np.random.randn() * factor  # Add random value
+                    target.z = hmap[jx2][kx2].z + hmap[jx2 + 2 * x][kx2].z +\
+                        hmap[jx2][kx2 + 2 * x].z + \
+                        hmap[jx2 + 2 * x][kx2 + 2 * x].z
+                    target.z = target.z / 4  # Divide to get average
+                    target.z += np.random.randn() * factor  # Add random value
 
         # Diamond centers
         y = 2**(i + 1)  # Variable assigned to speed up computation
@@ -138,22 +137,22 @@ def hmap_gen(m, scale_factor, exp_factor):
                 jx = j * x  # Variable assigned to speed up computation
                 kx = k * x  # Variable assigned to speed up computation
                 target = hmap[jx][kx]  # Get object from the matrix
-                if target.h == 0:  # Was point already evaluated
+                if target.z == 0:  # Was point already evaluated
                     if j != 0:  # Left border check
-                        target.h += hmap[jx - x][kx].h
+                        target.z += hmap[jx - x][kx].z
                         l += 1
                     if j != (y):  # Right border check
-                        target.h += hmap[jx + x][kx].h
+                        target.z += hmap[jx + x][kx].z
                         l += 1
                     if k != 0:  # Upper border check
-                        target.h += hmap[jx][kx - x].h
+                        target.z += hmap[jx][kx - x].z
                         l += 1
                     if k != (y):  # Lower corner check
-                        target.h += hmap[jx][kx + x].h
+                        target.z += hmap[jx][kx + x].z
                         l += 1
                     # Divide to get average
-                    target.h = target.h / l
-                    target.h += np.random.randn() * factor  # Add random value
+                    target.z = target.z / l
+                    target.z += np.random.randn() * factor  # Add random value
     return hmap
 
 
@@ -233,7 +232,7 @@ def dijkstra(m=8, random_endpoints=False):
                 # Setting new minimal distance
                 min_dist = p.d
                 target = p
-        x, y = target.pos  # Acquiring target position to evaluate neighbors
+        x, y = target.x, target.y  # Acquiring target position to evaluate neighbors
 
         # Performing steps of Dijkstra's algorithm for neighboring points
         path_step(target, x - 1, y, unvisited, hmap, n)
