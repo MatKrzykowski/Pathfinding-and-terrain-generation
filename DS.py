@@ -1,9 +1,13 @@
 # DS.py
 
 # Libraries import
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.path import Path
 
 from point import Point
+
 
 def gen_points(n):
     """Random endpoints coordinates generator function
@@ -31,11 +35,6 @@ def map_graph(hmap, endpoint, is_distancemap=False):
 
     A - printed 2D array
     """
-
-    # Matplotlib libraries import
-    import matplotlib.pyplot as plt
-    from matplotlib.path import Path
-    import matplotlib.patches as patches
 
     n = len(hmap)  # Compute sidelength of the map
 
@@ -70,10 +69,6 @@ def graph_3d(hmap):
     """3d visualization of the heightmap.
 
     hmap - imported heightmap"""
-
-    # Libraries import
-    import matplotlib.pyplot as plt
-    from mpl_toolkits.mplot3d import Axes3D
 
     n = len(hmap)  # Compute sidelength of the map
 
