@@ -5,6 +5,7 @@ import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.path import Path
+from tqdm import tqdm
 
 from point import Point
 
@@ -198,8 +199,6 @@ def dijkstra(m=8, random_endpoints=False):
     # heightmap
     exp_factor = 1.6
 
-    iteration = 0  # Number of Dijkstra's algorithm iterations for logging
-
     # Height map definition as n by n array of point objects
     hmap = hmap_gen(m, scale_factor, exp_factor)
 
@@ -220,7 +219,7 @@ def dijkstra(m=8, random_endpoints=False):
 
     # Infinite loop executing Dijkstra's algorithm
     # Breaks after endpoint is visited
-    while True:
+    for i in tqdm(range(n**2)):
         # Setting current minimal distance as distance of the endpoint
         min_dist = endpoint.d
         target = startpoint  # Temporary assignment
@@ -243,12 +242,6 @@ def dijkstra(m=8, random_endpoints=False):
         path_step(target, x - 1, y + 1, unvisited, hmap, n)
         path_step(target, x + 1, y - 1, unvisited, hmap, n)
         path_step(target, x + 1, y + 1, unvisited, hmap, n)
-
-        # Logging procedure
-        iteration += 1  # Increment of iteration counter
-        if iteration % 5000 == 0:  # Print every arbitrary number of iterations
-            # Print progress
-            print(str(100 * iteration / n**2)[0:4] + "%")
 
         # Check if target point is in unvisited set
         try:
