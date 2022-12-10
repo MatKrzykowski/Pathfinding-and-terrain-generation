@@ -236,8 +236,6 @@ def dijkstra(m=8, random_endpoints=False):
 
         # Performing steps of Dijkstra's algorithm for neighboring points
         for i, j in neighbors():
-            if i == j == 0:
-                continue
             path_step(target, x + i, y + i, unvisited, hmap, n)
 
         # Check if target point is in unvisited set
