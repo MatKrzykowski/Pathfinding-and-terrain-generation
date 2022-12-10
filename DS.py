@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.path import Path
 from tqdm import tqdm
+from itertools import product
 
 from point import Point
 
@@ -46,7 +47,7 @@ def map_graph(hmap, endpoint, is_distancemap=False):
         A = np.array([[hmap[i][j].z for i in range(n)] for j in range(n)])
 
     # Copy path assigned to end point
-    verts = np.array(endpoint.path)[:,0:2]
+    verts = np.array(endpoint.path)[:, 0:2]
     # Assign codes to the verts
     codes = [Path.LINETO for i in range(len(verts))]  # optional Path.CURVE4
     codes[0] = Path.MOVETO  # Start point code
@@ -234,14 +235,10 @@ def dijkstra(m=8, random_endpoints=False):
         x, y = target.x, target.y  # Acquiring target position to evaluate neighbors
 
         # Performing steps of Dijkstra's algorithm for neighboring points
-        path_step(target, x - 1, y, unvisited, hmap, n)
-        path_step(target, x + 1, y, unvisited, hmap, n)
-        path_step(target, x, y - 1, unvisited, hmap, n)
-        path_step(target, x, y + 1, unvisited, hmap, n)
-        path_step(target, x - 1, y - 1, unvisited, hmap, n)
-        path_step(target, x - 1, y + 1, unvisited, hmap, n)
-        path_step(target, x + 1, y - 1, unvisited, hmap, n)
-        path_step(target, x + 1, y + 1, unvisited, hmap, n)
+        for i, j in product((-1, 0, 1), repeat=2):
+            if i == j == 0:
+                continue
+            path_step(target, x + i, y + i, unvisited, hmap, n)
 
         # Check if target point is in unvisited set
         try:
