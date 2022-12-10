@@ -6,8 +6,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.path import Path
 from tqdm import tqdm
-from itertools import product
 
+from common import neighbors
 from point import Point
 
 
@@ -235,7 +235,7 @@ def dijkstra(m=8, random_endpoints=False):
         x, y = target.x, target.y  # Acquiring target position to evaluate neighbors
 
         # Performing steps of Dijkstra's algorithm for neighboring points
-        for i, j in product((-1, 0, 1), repeat=2):
+        for i, j in neighbors():
             if i == j == 0:
                 continue
             path_step(target, x + i, y + i, unvisited, hmap, n)
