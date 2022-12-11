@@ -8,6 +8,7 @@ from matplotlib.path import Path
 from tqdm import tqdm
 
 from common import neighbors
+from parameters import Params
 from point import Point
 
 
@@ -89,7 +90,7 @@ def graph_3d(hmap):
     plt.show()  # Print 3d map
 
 
-def hmap_gen(m, scale_factor, exp_factor):
+def hmap_gen(params):
     """Height map generator using diamond-square algorith. Returns heightmap with generated points.
 
     m - number of diamond-square algorithm steps, determines sidelength of the map to be 2**m + 1,
@@ -103,19 +104,19 @@ def hmap_gen(m, scale_factor, exp_factor):
     hmap = [[Point(0.0, i, j, path=[]) for j in range(n)] for i in range(n)]
 
     # Corner points generator to start off DSA
-    hmap[0][0].z = np.random.randn() * scale_factor
-    hmap[2**m][0].z = np.random.randn() * scale_factor
-    hmap[0][2**m].z = np.random.randn() * scale_factor
-    hmap[2**m][2**m].z = np.random.randn() * scale_factor
+    hmap[0][0].z = np.random.randn() * params.scale_factor
+    hmap[2**m][0].z = np.random.randn() * params.scale_factor
+    hmap[0][2**m].z = np.random.randn() * params.scale_factor
+    hmap[2**m][2**m].z = np.random.randn() * params.scale_factor
     # Center assigned for "hill" feature
-    hmap[2**(m - 1)][2**(m - 1)].z = 3 * scale_factor
+    hmap[2**(m - 1)][2**(m - 1)].z = 3 * params.scale_factor
 
     # Loop over m - number of stages of the algorithm
     for i in range(m):
         x = 2**(m - i - 1)  # Variable assigned to speed up computation
 
         # Squere centers
-        factor = scale_factor * exp_factor**(-i - 1)  # Modified scale factor
+        factor = params.scale_factor * params.exp_factor**(-i - 1)  # Modified scale factor
         for j in range(2**i):  # Loop over x axis
             for k in range(2**i):  # Loop over y axis
                 jx2 = j * x * 2  # Variable assigned to speed up computation
@@ -132,7 +133,7 @@ def hmap_gen(m, scale_factor, exp_factor):
 
         # Diamond centers
         y = 2**(i + 1)  # Variable assigned to speed up computation
-        factor = scale_factor * exp_factor**(-i - 1.5)  # Modified scale factor
+        factor = params.scale_factor * params.exp_factor**(-i - 1.5)  # Modified scale factor
         for j in range(y + 1):  # Loop over x axis
             for k in range(y + 1):  # Loop over y axis
                 l = 0  # Number of added values used to calculate average
@@ -242,15 +243,17 @@ def dijkstra(hmap, random_endpoints=False):
 
 if __name__ == "__main__":
     # Parameters
-    m = 8
-    n = 2**m + 1  # Sidelength of the heightmap
-    scale_factor = n / 4  # Height scale factor
-    # Scale decresing factor for DSA, the larger the value the smoother the
-    # heightmap
-    exp_factor = 1.6
+    params = Params(
+        m := 8,
+        n := 2**m + 1,  # Sidelength of the heightmap
+        scale_factor=n,  # Height scale factor
+        # Scale decresing factor for DSA, the larger the value the smoother the
+        # heightmap
+        exp_factor=1.6
+    )
 
     # Height map definition as n by n array of point objects
-    hmap = hmap_gen(m, scale_factor, exp_factor)
+    hmap = hmap_gen(params)
 
     endpoint = dijkstra(hmap)
 
