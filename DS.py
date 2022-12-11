@@ -186,22 +186,12 @@ def path_step(origin, x, y, unvisited, hmap, n):
 #####################################################################
 
 
-def dijkstra(m=8, random_endpoints=False):
+def dijkstra(hmap, random_endpoints=False):
     """Function performing Dijkstra's algorithm on the generated heightmap.
 
     m - number of stages of diamond-square algorithm
     random_endpoints - Boolean deciding whether or not endpoints should be assigned
     at random or should be put in the opposite corners."""
-
-    # Parameters
-    n = 2**m + 1  # Sidelength of the heightmap
-    scale_factor = n / 4  # Height scale factor
-    # Scale decresing factor for DSA, the larger the value the smoother the
-    # heightmap
-    exp_factor = 1.6
-
-    # Height map definition as n by n array of point objects
-    hmap = hmap_gen(m, scale_factor, exp_factor)
 
     # Path endpoints generation
     if random_endpoints:  # Random
@@ -220,7 +210,7 @@ def dijkstra(m=8, random_endpoints=False):
 
     # Infinite loop executing Dijkstra's algorithm
     # Breaks after endpoint is visited
-    for i in tqdm(range(n**2)):
+    for _ in tqdm(range(n**2)):
         # Setting current minimal distance as distance of the endpoint
         min_dist = endpoint.d
         target = startpoint  # Temporary assignment
@@ -236,7 +226,7 @@ def dijkstra(m=8, random_endpoints=False):
 
         # Performing steps of Dijkstra's algorithm for neighboring points
         for i, j in neighbors():
-            path_step(target, x + i, y + i, unvisited, hmap, n)
+            path_step(target, x + i, y + j, unvisited, hmap, n)
 
         # Check if target point is in unvisited set
         try:
@@ -247,11 +237,22 @@ def dijkstra(m=8, random_endpoints=False):
         except AttributeError:
             break  # End the loop
 
-    return hmap, endpoint  # Return for plotting
+    return endpoint  # Return for plotting
 
 
 if __name__ == "__main__":
-    hmap, endpoint = dijkstra()
+    # Parameters
+    m = 8
+    n = 2**m + 1  # Sidelength of the heightmap
+    scale_factor = n / 4  # Height scale factor
+    # Scale decresing factor for DSA, the larger the value the smoother the
+    # heightmap
+    exp_factor = 1.6
+
+    # Height map definition as n by n array of point objects
+    hmap = hmap_gen(m, scale_factor, exp_factor)
+
+    endpoint = dijkstra(hmap)
 
     # Print the results
     map_graph(hmap, endpoint)
