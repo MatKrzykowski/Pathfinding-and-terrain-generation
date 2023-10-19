@@ -5,27 +5,10 @@ import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.path import Path
-from tqdm import tqdm
 
-from common import neighbors
+from dijkstra import dijkstra
 from parameters import Params
 from point import Point
-
-
-def gen_points(n):
-    """Random endpoints coordinates generator function
-
-    Returns tuple of two points (x, y) which distance is guaranteed to be larger
-    than side of the map.
-    n - sidelenght of the map"""
-
-    while True:  # Execute until rights points are found
-        # Random integers from 0 to n-1
-        x1, y1, x2, y2 = np.random.randint(n, size=4)
-
-        # Exit if distance between points larger than side length
-        if (x1 - x2)**2 + (y1 - y2)**2 > n**2:
-            return (x1, y1, x2, y2)
 
 
 def map_graph(hmap, endpoint, is_distancemap=False):
@@ -83,8 +66,8 @@ def graph_3d(hmap):
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
     ax.plot_surface(X, Y, Z, color='r')
-    surf = ax.plot_surface(X, Y, Z, rstride=5, cstride=5,
-                           cmap=plt.cm.coolwarm, linewidth=0)
+    surf = ax.plot_surface(
+        X, Y, Z, rstride=5, cstride=5, cmap=plt.cm.coolwarm, linewidth=0)
     fig.colorbar(surf, shrink=0.5, aspect=5)
 
     plt.show()  # Print 3d map
@@ -116,7 +99,8 @@ def hmap_gen(params):
         x = 2**(m - i - 1)  # Variable assigned to speed up computation
 
         # Squere centers
-        factor = params.scale_factor * params.exp_factor**(-i - 1)  # Modified scale factor
+        factor = params.scale_factor * params.exp_factor**(
+            -i - 1)  # Modified scale factor
         for j in range(2**i):  # Loop over x axis
             for k in range(2**i):  # Loop over y axis
                 jx2 = j * x * 2  # Variable assigned to speed up computation
@@ -133,7 +117,8 @@ def hmap_gen(params):
 
         # Diamond centers
         y = 2**(i + 1)  # Variable assigned to speed up computation
-        factor = params.scale_factor * params.exp_factor**(-i - 1.5)  # Modified scale factor
+        factor = params.scale_factor * params.exp_factor**(
+            -i - 1.5)  # Modified scale factor
         for j in range(y + 1):  # Loop over x axis
             for k in range(y + 1):  # Loop over y axis
                 l = 0  # Number of added values used to calculate average
@@ -159,88 +144,6 @@ def hmap_gen(params):
     return hmap
 
 
-def path_step(origin, x, y, unvisited, hmap, n):
-    """Function performing single step of Dijkstra's algorithm.
-
-    origin - origin point,
-    x,y - go-to point,
-    z - distance in x-y plane, 1 for direct and 2 for diagonal neighbors,
-    unvisited - set of unvisited points
-    hmap - heightmap
-    n - sidelength of the heightmap."""
-
-    # Check if origin point is not on the boundary
-    if min(x, y) != -1 and max(x, y) != n:
-        # Check if go-to point was already visited
-        go_to = hmap[x][y]
-        if not go_to.visited:
-            # Calculating new path length to go-to point
-            a = origin.d + origin.dist(go_to)
-            # If shorter than previous one
-            if a < go_to.d:
-                go_to.d = a  # Assign shorter path length
-                # Assign new path appended by go_to point's position
-                go_to.path = origin.path + [go_to.pos]
-                # Add to unvisited set (if wasn't there already)
-                unvisited.add(go_to)
-
-#####################################################################
-
-
-def dijkstra(hmap, random_endpoints=False):
-    """Function performing Dijkstra's algorithm on the generated heightmap.
-
-    m - number of stages of diamond-square algorithm
-    random_endpoints - Boolean deciding whether or not endpoints should be assigned
-    at random or should be put in the opposite corners."""
-
-    # Path endpoints generation
-    if random_endpoints:  # Random
-        x1, y1, x2, y2 = gen_points(n)
-    else:  # Determined to be in the opposite corners
-        x1, y1, x2, y2 = 0, 0, n - 1, n - 1
-
-    # Assigning startpoint
-    startpoint = hmap[x1][y1]
-    startpoint.d = 0.0  # Setting distance of starting point as 0.0
-    startpoint.path = [startpoint.pos]  # Setting path
-    unvisited = {startpoint}  # Unvisited set declaration
-
-    # Assigning endpoint
-    endpoint = hmap[x2][y2]
-
-    # Infinite loop executing Dijkstra's algorithm
-    # Breaks after endpoint is visited
-    for _ in tqdm(range(n**2)):
-        # Setting current minimal distance as distance of the endpoint
-        min_dist = endpoint.d
-        target = startpoint  # Temporary assignment
-
-        # Looking for minimal distance among unvisited points
-        for p in unvisited:
-            # If lesser distance is found
-            if min_dist > p.d:
-                # Setting new minimal distance
-                min_dist = p.d
-                target = p
-        x, y = target.x, target.y  # Acquiring target position to evaluate neighbors
-
-        # Performing steps of Dijkstra's algorithm for neighboring points
-        for i, j in neighbors():
-            path_step(target, x + i, y + j, unvisited, hmap, n)
-
-        # Check if target point is in unvisited set
-        try:
-            del target.path  # Delete its path to free memory
-            unvisited.remove(target)  # Remove from unvisited set
-            target.visited = True  # Set as visited
-        # If not exit the loop
-        except AttributeError:
-            break  # End the loop
-
-    return endpoint  # Return for plotting
-
-
 if __name__ == "__main__":
     # Parameters
     params = Params(
@@ -249,13 +152,12 @@ if __name__ == "__main__":
         scale_factor=n,  # Height scale factor
         # Scale decresing factor for DSA, the larger the value the smoother the
         # heightmap
-        exp_factor=1.6
-    )
+        exp_factor=1.6)
 
     # Height map definition as n by n array of point objects
     hmap = hmap_gen(params)
 
-    endpoint = dijkstra(hmap)
+    endpoint = dijkstra(hmap, params)
 
     # Print the results
     map_graph(hmap, endpoint)
