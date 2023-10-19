@@ -77,7 +77,7 @@ def graph_3d(hmap):
     # Prepare data for the plot
     I = np.array([i for i in range(n)])
     X, Y = np.meshgrid(I, I)
-    Z = np.array([[hmap[i][j].h for i in range(n)] for j in range(n)])
+    Z = np.array([[hmap[i][j].z for i in range(n)] for j in range(n)])
 
     # Prepare plot
     fig = plt.figure()
