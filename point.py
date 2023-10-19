@@ -1,7 +1,6 @@
-# Point.py
+"""point.py"""
 
-from numpy import array, inf
-from numpy.linalg import norm
+import numpy as np
 
 
 class Point:
@@ -9,7 +8,7 @@ class Point:
 
     def __init__(self, z, x, y, path):
         """Initialization method"""
-        self.d = inf  # distance from the startpoint, set to infinity as per DA
+        self.d = np.inf  # distance from the startpoint, set to infinity as per DA
         self.x = x
         self.y = y
         self.z = z
@@ -18,9 +17,9 @@ class Point:
 
     @property
     def pos(self):
-        return array([self.x, self.y, self.z])
+        """Returns 3D point position as numpy array"""
+        return np.array([self.x, self.y, self.z])
 
     def dist(self, other):
         """Method calculating distance between two others given poth points."""
-
-        return norm(self.pos - other.pos)
+        return np.linalg.norm(self.pos - other.pos)
