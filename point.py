@@ -6,7 +6,7 @@ import numpy as np
 class Point:
     """Class describing single point on the heightmap."""
 
-    def __init__(self, z, x, y, path):
+    def __init__(self, z, x, y):
         """Initialization method"""
         self.x = x
         self.y = y

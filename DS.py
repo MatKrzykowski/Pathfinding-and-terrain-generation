@@ -80,7 +80,7 @@ def hmap_gen(params):
     n = 2**m + 1  # Sidelength of the heightmap
 
     # Generate n by n matrix of point objects
-    hmap = [[Point(0.0, i, j, path=[]) for j in range(n)] for i in range(n)]
+    hmap = [[Point(0.0, i, j) for j in range(n)] for i in range(n)]
 
     # Corner points generator to start off DSA
     hmap[0][0].z = np.random.randn() * params.scale_factor
