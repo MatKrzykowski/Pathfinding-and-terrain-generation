@@ -23,7 +23,7 @@ def gen_points(n):
             return (x1, y1, x2, y2)
 
 
-def path_step(origin, path, d, x, y, to_be_visited, hmap, n):
+def path_step(origin, goal, path, d, to_be_visited, n):
     """Function performing single step of Dijkstra's algorithm.
 
     origin - origin point,
@@ -33,15 +33,12 @@ def path_step(origin, path, d, x, y, to_be_visited, hmap, n):
     hmap - heightmap
     n - sidelength of the heightmap."""
 
-    # Check if origin point is not on the boundary
-    if min(x, y) != -1 and max(x, y) != n:
-        # Check if go-to point was already visited
-        go_to = hmap[x][y]
-        if not go_to.visited:
-            # Calculating new path length to go-to point
-            d += origin.dist(go_to)
-            # If shorter than previous one
-            heapq.heappush(to_be_visited, [d, path + [go_to.pos]])
+    # Check if go-to point was already visited
+    if not goal.visited:
+        # Calculating new path length to go-to point
+        d += origin.dist(goal)
+        # If shorter than previous one
+        heapq.heappush(to_be_visited, [d, path + [goal.pos]])
 
 
 def dijkstra(hmap, params, random_endpoints=False):
@@ -61,7 +58,7 @@ def dijkstra(hmap, params, random_endpoints=False):
     # Assigning startpoint
     startpoint = hmap[x1][y1]
     startpoint.d = 0
-    to_be_visited = [[startpoint.d, [startpoint.pos]]]  # to_be_visited set declaration
+    to_be_visited = [[startpoint.d, [startpoint.pos]]]
 
     # Assigning endpoint
     endpoint = hmap[x2][y2]
@@ -75,15 +72,17 @@ def dijkstra(hmap, params, random_endpoints=False):
             x, y, _ = path[-1]
             x = int(x)
             y = int(y)
-            point = hmap[x][y]
-            if not point.visited:
+            origin = hmap[x][y]
+            if not origin.visited:
                 break
 
         if x == x2 and y == y2:
             return path + [endpoint.pos]
+    
         
-        
-        point.visited = True
+        origin.visited = True
 
-        for i, j in neighbors():
-            path_step(point, path, d, x + i, y + j, to_be_visited, hmap, n)
+        for dx, dy in neighbors():
+            if 0 <= x + dx < n and 0 <= y + dy < n:
+                goal = hmap[x + dx][y + dy]
+                path_step(origin, goal, path, d, to_be_visited, n)
