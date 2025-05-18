@@ -1,5 +1,12 @@
-from itertools import product
-from operator import or_
+"""common.py"""
 
-def neighbors():
-    return filter(lambda x: or_(*x), product((-1, 0, 1), repeat=2))
+NEIGHBORS =  (
+    (1, 1),
+    (1, 0),
+    (1, -1),
+    (0, 1),
+    (0, -1),
+    (-1, 1),
+    (-1, 0),
+    (-1, -1),
+)

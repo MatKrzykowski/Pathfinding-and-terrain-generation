@@ -6,7 +6,7 @@ import numpy as np
 from tqdm import tqdm
 
 from path import Path
-from common import neighbors
+from common import NEIGHBORS
 
 
 def gen_points(n):
@@ -65,8 +65,7 @@ def dijkstra(hmap, params, random_endpoints=False):
         if x == x2 and y == y2:
             return Path(endpoint.pos, path)
 
-        for dx, dy in neighbors():
-            
+        for dx, dy in NEIGHBORS:
             if 0 <= x + dx < n and 0 <= y + dy < n:
                 goal = hmap[x + dx][y + dy]
                 d = dist[x][y] + origin.dist(goal)
