@@ -1,5 +1,7 @@
 """dijkstra.py"""
 
+import heapq
+
 import numpy as np
 from tqdm import tqdm
 from common import neighbors
@@ -21,13 +23,13 @@ def gen_points(n):
             return (x1, y1, x2, y2)
 
 
-def path_step(origin, x, y, unvisited, hmap, n):
+def path_step(origin, path, x, y, to_be_visited, hmap, n):
     """Function performing single step of Dijkstra's algorithm.
 
     origin - origin point,
     x,y - go-to point,
     z - distance in x-y plane, 1 for direct and 2 for diagonal neighbors,
-    unvisited - set of unvisited points
+    to_be_visited - set of to_be_visited points
     hmap - heightmap
     n - sidelength of the heightmap."""
 
@@ -42,9 +44,8 @@ def path_step(origin, x, y, unvisited, hmap, n):
             if a < go_to.d:
                 go_to.d = a  # Assign shorter path length
                 # Assign new path appended by go_to point's position
-                go_to.path = origin.path + [go_to.pos]
-                # Add to unvisited set (if wasn't there already)
-                unvisited.add(go_to)
+                # Add to to_be_visited set (if wasn't there already)
+                heapq.heappush(to_be_visited, [a, path + [go_to.pos]])
 
 
 def dijkstra(hmap, params, random_endpoints=False):
@@ -63,9 +64,8 @@ def dijkstra(hmap, params, random_endpoints=False):
 
     # Assigning startpoint
     startpoint = hmap[x1][y1]
-    startpoint.d = 0.0  # Setting distance of starting point as 0.0
-    startpoint.path = [startpoint.pos]  # Setting path
-    unvisited = {startpoint}  # Unvisited set declaration
+    startpoint.d = 0
+    to_be_visited = [[startpoint.d, [startpoint.pos]]]  # to_be_visited set declaration
 
     # Assigning endpoint
     endpoint = hmap[x2][y2]
@@ -73,30 +73,21 @@ def dijkstra(hmap, params, random_endpoints=False):
     # Infinite loop executing Dijkstra's algorithm
     # Breaks after endpoint is visited
     for _ in tqdm(range(n**2)):
-        # Setting current minimal distance as distance of the endpoint
-        min_dist = endpoint.d
-        target = startpoint  # Temporary assignment
 
-        # Looking for minimal distance among unvisited points
-        for p in unvisited:
-            # If lesser distance is found
-            if min_dist > p.d:
-                # Setting new minimal distance
-                min_dist = p.d
-                target = p
-        x, y = target.x, target.y  # Acquiring target position to evaluate neighbors
+        while True:
+            path = heapq.heappop(to_be_visited)[1]
+            x, y, _ = path[-1]
+            x = int(x)
+            y = int(y)
+            point = hmap[x][y]
+            if not point.visited:
+                break
 
-        # Performing steps of Dijkstra's algorithm for neighboring points
+        if x == x2 and y == y2:
+            return path + [endpoint.pos]
+        
+        
+        point.visited = True
+
         for i, j in neighbors():
-            path_step(target, x + i, y + j, unvisited, hmap, n)
-
-        # Check if target point is in unvisited set
-        try:
-            del target.path  # Delete its path to free memory
-            unvisited.remove(target)  # Remove from unvisited set
-            target.visited = True  # Set as visited
-        # If not exit the loop
-        except AttributeError:
-            break  # End the loop
-
-    return endpoint  # Return for plotting
+            path_step(point, path, x + i, y + j, to_be_visited, hmap, n)

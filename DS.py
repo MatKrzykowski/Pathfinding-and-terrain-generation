@@ -11,7 +11,7 @@ from parameters import Params
 from point import Point
 
 
-def map_graph(hmap, endpoint, is_distancemap=False):
+def map_graph(hmap, path, is_distancemap=False):
     """Print 2D map function using matplotlib with visible path between endpoints.
 
     hmap - imported heightmap
@@ -31,7 +31,7 @@ def map_graph(hmap, endpoint, is_distancemap=False):
         A = np.array([[hmap[i][j].z for i in range(n)] for j in range(n)])
 
     # Copy path assigned to end point
-    verts = np.array(endpoint.path)[:, 0:2]
+    verts = np.array(path)[:, 0:2]
     # Assign codes to the verts
     codes = [Path.LINETO for i in range(len(verts))]  # optional Path.CURVE4
     codes[0] = Path.MOVETO  # Start point code
@@ -147,7 +147,7 @@ def hmap_gen(params):
 if __name__ == "__main__":
     # Parameters
     params = Params(
-        m := 8,
+        m := 10,
         n := 2**m + 1,  # Sidelength of the heightmap
         scale_factor=n,  # Height scale factor
         # Scale decresing factor for DSA, the larger the value the smoother the
@@ -157,8 +157,8 @@ if __name__ == "__main__":
     # Height map definition as n by n array of point objects
     hmap = hmap_gen(params)
 
-    endpoint = dijkstra(hmap, params)
+    path = dijkstra(hmap, params)
 
     # Print the results
-    map_graph(hmap, endpoint)
+    map_graph(hmap, path)
     # graph_3d(hmap)
