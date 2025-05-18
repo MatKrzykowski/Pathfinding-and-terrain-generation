@@ -41,7 +41,7 @@ def dijkstra(hmap, params, random_endpoints=False):
 
     # Assigning startpoint
     startpoint = hmap[x1][y1]
-    to_be_visited = [[0, Path(startpoint.pos)]]
+    to_be_visited = [[0, x1, y1, Path(startpoint.pos)]]
 
     # visited = np.zeros((n, n), "bool")
     dist = np.ones((n, n), dtype="float64") * float("inf")
@@ -54,10 +54,7 @@ def dijkstra(hmap, params, random_endpoints=False):
     # Breaks after endpoint is visited
     for _ in tqdm(range(n**2)):
         while True:
-            d, path = heapq.heappop(to_be_visited)
-            x, y, _ = path.coord
-            x = int(x)
-            y = int(y)
+            d, x, y, path = heapq.heappop(to_be_visited)
             if d == dist[x, y]:
                 origin = hmap[x][y]
                 break
@@ -66,13 +63,15 @@ def dijkstra(hmap, params, random_endpoints=False):
             return Path(endpoint.pos, path)
 
         for dx, dy in NEIGHBORS:
-            if 0 <= x + dx < n and 0 <= y + dy < n:
-                goal = hmap[x + dx][y + dy]
-                d = dist[x][y] + origin.dist(goal)
-                if d > dist[x+dx][y+dy]:
+            xdx = x + dx
+            ydy = y + dy
+            if 0 <= xdx < n and 0 <= ydy < n:
+                goal = hmap[xdx][ydy]
+                d = dist[x, y] + origin.dist(goal)
+                if d > dist[xdx][ydy]:
                     continue
-                dist[x+dx][y+dy] = d
+                dist[xdx, ydy] = d
                 heapq.heappush(
                     to_be_visited,
-                    [d, Path(goal.pos, path)]
+                    [d, xdx, ydy, Path(goal.pos, path)]
                 )
