@@ -58,7 +58,7 @@ def graph_3d(hmap):
     n = len(hmap)  # Compute sidelength of the map
 
     # Prepare data for the plot
-    I = np.array([i for i in range(n)])
+    I = np.arange(n)
     X, Y = np.meshgrid(I, I)
     Z = np.array([[hmap[i][j].z for i in range(n)] for j in range(n)])
 
