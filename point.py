@@ -8,7 +8,6 @@ class Point:
 
     def __init__(self, z, x, y, path):
         """Initialization method"""
-        self.d = np.inf  # distance from the startpoint, set to infinity as per DA
         self.x = x
         self.y = y
         self.z = z

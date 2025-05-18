@@ -23,7 +23,7 @@ def gen_points(n):
             return (x1, y1, x2, y2)
 
 
-def path_step(origin, path, x, y, to_be_visited, hmap, n):
+def path_step(origin, path, d, x, y, to_be_visited, hmap, n):
     """Function performing single step of Dijkstra's algorithm.
 
     origin - origin point,
@@ -39,13 +39,9 @@ def path_step(origin, path, x, y, to_be_visited, hmap, n):
         go_to = hmap[x][y]
         if not go_to.visited:
             # Calculating new path length to go-to point
-            a = origin.d + origin.dist(go_to)
+            d += origin.dist(go_to)
             # If shorter than previous one
-            if a < go_to.d:
-                go_to.d = a  # Assign shorter path length
-                # Assign new path appended by go_to point's position
-                # Add to to_be_visited set (if wasn't there already)
-                heapq.heappush(to_be_visited, [a, path + [go_to.pos]])
+            heapq.heappush(to_be_visited, [d, path + [go_to.pos]])
 
 
 def dijkstra(hmap, params, random_endpoints=False):
@@ -75,7 +71,7 @@ def dijkstra(hmap, params, random_endpoints=False):
     for _ in tqdm(range(n**2)):
 
         while True:
-            path = heapq.heappop(to_be_visited)[1]
+            d, path = heapq.heappop(to_be_visited)
             x, y, _ = path[-1]
             x = int(x)
             y = int(y)
@@ -90,4 +86,4 @@ def dijkstra(hmap, params, random_endpoints=False):
         point.visited = True
 
         for i, j in neighbors():
-            path_step(point, path, x + i, y + j, to_be_visited, hmap, n)
+            path_step(point, path, d, x + i, y + j, to_be_visited, hmap, n)
