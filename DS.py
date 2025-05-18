@@ -11,7 +11,7 @@ from parameters import Params
 from point import Point
 
 
-def map_graph(hmap, path, is_distancemap=False):
+def map_graph(hmap, path):
     """Print 2D map function using matplotlib with visible path between endpoints.
 
     hmap - imported heightmap
@@ -24,11 +24,7 @@ def map_graph(hmap, path, is_distancemap=False):
     n = len(hmap)  # Compute sidelength of the map
 
     # Copy distancemap to A
-    if is_distancemap:
-        A = np.array([[hmap[i][j].d for i in range(n)] for j in range(n)])
-    # Copy height map to A
-    else:
-        A = np.array([[hmap[i][j].z for i in range(n)] for j in range(n)])
+    A = np.array([[hmap[i][j].z for i in range(n)] for j in range(n)])
 
     # Copy path assigned to end point
     verts = np.array(path)[:, 0:2]
