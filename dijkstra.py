@@ -23,7 +23,7 @@ def gen_points(n):
             return (x1, y1, x2, y2)
 
 
-def path_step(origin, goal, path, d, to_be_visited, n):
+def path_step(origin, goal, path, d, to_be_visited,):
     """Function performing single step of Dijkstra's algorithm.
 
     origin - origin point,
@@ -33,12 +33,10 @@ def path_step(origin, goal, path, d, to_be_visited, n):
     hmap - heightmap
     n - sidelength of the heightmap."""
 
-    # Check if go-to point was already visited
-    if not goal.visited:
-        # Calculating new path length to go-to point
-        d += origin.dist(goal)
-        # If shorter than previous one
-        heapq.heappush(to_be_visited, [d, path + [goal.pos]])
+    heapq.heappush(
+        to_be_visited,
+        [d + origin.dist(goal), path + [goal.pos]]
+    )
 
 
 def dijkstra(hmap, params, random_endpoints=False):
@@ -60,6 +58,8 @@ def dijkstra(hmap, params, random_endpoints=False):
     startpoint.d = 0
     to_be_visited = [[startpoint.d, [startpoint.pos]]]
 
+    visited = np.zeros((n, n), "bool")
+
     # Assigning endpoint
     endpoint = hmap[x2][y2]
 
@@ -72,17 +72,15 @@ def dijkstra(hmap, params, random_endpoints=False):
             x, y, _ = path[-1]
             x = int(x)
             y = int(y)
-            origin = hmap[x][y]
-            if not origin.visited:
+            if not visited[x, y]:
+                origin = hmap[x][y]
+                visited[x, y] = True
                 break
 
         if x == x2 and y == y2:
             return path + [endpoint.pos]
-    
-        
-        origin.visited = True
 
         for dx, dy in neighbors():
             if 0 <= x + dx < n and 0 <= y + dy < n:
                 goal = hmap[x + dx][y + dy]
-                path_step(origin, goal, path, d, to_be_visited, n)
+                path_step(origin, goal, path, d, to_be_visited)

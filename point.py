@@ -13,7 +13,6 @@ class Point:
         self.x = x
         self.y = y
         self.z = z
-        self.visited = False  # check if point was visited by DA yet
 
     @property
     def pos(self) -> Iterable[float]:
