@@ -4,6 +4,8 @@ import heapq
 
 import numpy as np
 from tqdm import tqdm
+
+from path import Path
 from common import neighbors
 
 
@@ -35,7 +37,7 @@ def path_step(origin, goal, path, d, to_be_visited,):
 
     heapq.heappush(
         to_be_visited,
-        [d + origin.dist(goal), path + [goal.pos]]
+        [d + origin.dist(goal), Path(goal.pos, path)]
     )
 
 
@@ -56,7 +58,7 @@ def dijkstra(hmap, params, random_endpoints=False):
     # Assigning startpoint
     startpoint = hmap[x1][y1]
     startpoint.d = 0
-    to_be_visited = [[startpoint.d, [startpoint.pos]]]
+    to_be_visited = [[startpoint.d, Path(startpoint.pos)]]
 
     visited = np.zeros((n, n), "bool")
 
@@ -69,7 +71,7 @@ def dijkstra(hmap, params, random_endpoints=False):
 
         while True:
             d, path = heapq.heappop(to_be_visited)
-            x, y, _ = path[-1]
+            x, y, _ = path.coord
             x = int(x)
             y = int(y)
             if not visited[x, y]:
@@ -78,7 +80,7 @@ def dijkstra(hmap, params, random_endpoints=False):
                 break
 
         if x == x2 and y == y2:
-            return path + [endpoint.pos]
+            return Path(endpoint.pos, path)
 
         for dx, dy in neighbors():
             if 0 <= x + dx < n and 0 <= y + dy < n:

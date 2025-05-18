@@ -27,7 +27,7 @@ def map_graph(hmap, path):
     A = np.array([[hmap[i][j].z for i in range(n)] for j in range(n)])
 
     # Copy path assigned to end point
-    verts = np.array(path)[:, 0:2]
+    verts = np.array(path.get_path())[:, 0:2]
     # Assign codes to the verts
     codes = [Path.LINETO for i in range(len(verts))]  # optional Path.CURVE4
     codes[0] = Path.MOVETO  # Start point code
