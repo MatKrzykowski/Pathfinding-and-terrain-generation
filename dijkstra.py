@@ -21,7 +21,7 @@ def gen_points(n):
         x1, y1, x2, y2 = np.random.randint(n, size=4)
 
         # Exit if distance between points larger than side length
-        if (x1 - x2)**2 + (y1 - y2)**2 > n**2:
+        if (x1 - x2) ** 2 + (y1 - y2) ** 2 > n**2:
             return (x1, y1, x2, y2)
 
 
@@ -71,7 +71,4 @@ def dijkstra(hmap, params, random_endpoints=False):
                 if d > dist[xdx][ydy]:
                     continue
                 dist[xdx, ydy] = d
-                heapq.heappush(
-                    to_be_visited,
-                    [d, xdx, ydy, Path(goal.pos, path)]
-                )
+                heapq.heappush(to_be_visited, [d, xdx, ydy, Path(goal.pos, path)])

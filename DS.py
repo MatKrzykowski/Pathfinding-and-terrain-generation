@@ -36,11 +36,11 @@ def map_graph(hmap, path):
     path = Path(verts, codes)
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    patch = patches.PathPatch(path, edgecolor='red', facecolor='none', lw=1)
+    patch = patches.PathPatch(path, edgecolor="red", facecolor="none", lw=1)
     ax.add_patch(patch)
 
     # Preparing map to be printed
-    plt.imshow(A, cmap='bone', interpolation='nearest')
+    plt.imshow(A, cmap="bone", interpolation="nearest")
 
     # Printing the result
     plt.show()
@@ -60,10 +60,11 @@ def graph_3d(hmap):
 
     # Prepare plot
     fig = plt.figure()
-    ax = fig.add_subplot(111, projection='3d')
-    ax.plot_surface(X, Y, Z, color='r')
+    ax = fig.add_subplot(111, projection="3d")
+    ax.plot_surface(X, Y, Z, color="r")
     surf = ax.plot_surface(
-        X, Y, Z, rstride=5, cstride=5, cmap=plt.cm.coolwarm, linewidth=0)
+        X, Y, Z, rstride=5, cstride=5, cmap=plt.cm.coolwarm, linewidth=0
+    )
     fig.colorbar(surf, shrink=0.5, aspect=5)
 
     plt.show()  # Print 3d map
@@ -88,15 +89,16 @@ def hmap_gen(params):
     hmap[0][2**m].z = np.random.randn() * params.scale_factor
     hmap[2**m][2**m].z = np.random.randn() * params.scale_factor
     # Center assigned for "hill" feature
-    hmap[2**(m - 1)][2**(m - 1)].z = 3 * params.scale_factor
+    hmap[2 ** (m - 1)][2 ** (m - 1)].z = 3 * params.scale_factor
 
     # Loop over m - number of stages of the algorithm
     for i in range(m):
-        x = 2**(m - i - 1)  # Variable assigned to speed up computation
+        x = 2 ** (m - i - 1)  # Variable assigned to speed up computation
 
         # Squere centers
-        factor = params.scale_factor * params.exp_factor**(
-            -i - 1)  # Modified scale factor
+        factor = params.scale_factor * params.exp_factor ** (
+            -i - 1
+        )  # Modified scale factor
         for j in range(2**i):  # Loop over x axis
             for k in range(2**i):  # Loop over y axis
                 jx2 = j * x * 2  # Variable assigned to speed up computation
@@ -105,16 +107,20 @@ def hmap_gen(params):
                 target = hmap[jx2 + x][kx2 + x]  # Get object from the matrix
                 if target.z == 0:  # Skip if point already evaluated
                     # Add values of the neighbors
-                    target.z = hmap[jx2][kx2].z + hmap[jx2 + 2 * x][kx2].z +\
-                        hmap[jx2][kx2 + 2 * x].z + \
-                        hmap[jx2 + 2 * x][kx2 + 2 * x].z
+                    target.z = (
+                        hmap[jx2][kx2].z
+                        + hmap[jx2 + 2 * x][kx2].z
+                        + hmap[jx2][kx2 + 2 * x].z
+                        + hmap[jx2 + 2 * x][kx2 + 2 * x].z
+                    )
                     target.z = target.z / 4  # Divide to get average
                     target.z += np.random.randn() * factor  # Add random value
 
         # Diamond centers
-        y = 2**(i + 1)  # Variable assigned to speed up computation
-        factor = params.scale_factor * params.exp_factor**(
-            -i - 1.5)  # Modified scale factor
+        y = 2 ** (i + 1)  # Variable assigned to speed up computation
+        factor = params.scale_factor * params.exp_factor ** (
+            -i - 1.5
+        )  # Modified scale factor
         for j in range(y + 1):  # Loop over x axis
             for k in range(y + 1):  # Loop over y axis
                 l = 0  # Number of added values used to calculate average
@@ -148,7 +154,8 @@ if __name__ == "__main__":
         scale_factor=n,  # Height scale factor
         # Scale decresing factor for DSA, the larger the value the smoother the
         # heightmap
-        exp_factor=1.6)
+        exp_factor=1.6,
+    )
 
     # Height map definition as n by n array of point objects
     hmap = hmap_gen(params)
